@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm
+from .forms import SignUpForm, AddRecords
+from .models import Customer
 
 # Create your views here.
 def home(request):
+	customers = Customer.objects.all()
 
 	# Check to see if logging in
 	if request.method == 'POST':
@@ -20,7 +22,9 @@ def home(request):
 			messages.success(request, "There Was An Error Logging In, Please Try Again...")
 			return redirect('home')
 	else:
-		return render(request, 'myapp/home.html')
+		return render(request, 'myapp/home.html', {'customers':customers})
+	
+
 
 
 def login_user(request):
@@ -48,3 +52,36 @@ def register_user(request):
         "form":form
     }
     return render(request, 'myapp/register.html', context)
+
+
+def customer_records(request, pk):
+	if request.user.is_authenticated:
+		customer_record = Customer.objects.get(id = pk)
+		return render(request, 'myapp/customer.html', {'customer_record':customer_record})
+	else:
+		messages.success(request, 'You must Login to view the Customer Record')
+		return redirect('home')
+
+
+def delete(request, pk):
+	items = Customer.objects.get(id =pk)
+	if request.method == 'POST':
+		items.delete()
+		messages.success(request, f' {items} has been delete successfully!')
+		return redirect('home')
+	else:
+		return render(request, 'myapp/delete.html', {'items':items})      
+
+
+def AddCustomer(request):
+	if request.method =="POST":
+		form = AddRecords(request.POST)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Customer has been added successfully')
+			return redirect('home')
+		
+	else:
+		form = AddRecords()
+	return render(request, 'myapp/home.html', {'form':form})
+    

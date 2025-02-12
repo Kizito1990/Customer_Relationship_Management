@@ -1,0 +1,19 @@
+
+{% extends 'myapp/base.html' %}
+{% block title %} Register Page {% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %} 
+
+<br>
+    <div class="border bg-white p-3">
+      <h4>Add Products</h4>
+      <hr>
+      <form method="POST">
+          {% csrf_token %}
+          {{form|crispy}}
+          <input class="btn btn-success btn-block" type="submit" value="Add Product">
+      </form>
+  </div>
+</div>
+{% endblock %}
