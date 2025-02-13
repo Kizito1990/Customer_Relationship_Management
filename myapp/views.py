@@ -3,8 +3,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, AddRecords
 from .models import Customer
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+
 def home(request):
 	customers = Customer.objects.all()
 
@@ -62,7 +64,7 @@ def customer_records(request, pk):
 		messages.success(request, 'You must Login to view the Customer Record')
 		return redirect('home')
 
-
+@login_required(login_url='home')
 def delete(request, pk):
 	items = Customer.objects.get(id =pk)
 	if request.method == 'POST':
@@ -72,7 +74,7 @@ def delete(request, pk):
 	else:
 		return render(request, 'myapp/delete.html', {'items':items})      
 
-
+@login_required(login_url='home')
 def AddCustomer(request):
 	if request.method =="POST":
 		form = AddRecords(request.POST)
@@ -83,5 +85,21 @@ def AddCustomer(request):
 		
 	else:
 		form = AddRecords()
-	return render(request, 'myapp/home.html', {'form':form})
+	return render(request, 'myapp/add_record.html', {'form':form})
+
+
+@login_required(login_url='home')
+def UpdateCustomer(request, pk):
+	item = Customer.objects.get(id=pk)
+	if request.method =="POST":
+		form = AddRecords(request.POST, instance=item)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Customer record has been updated successfully')
+			return redirect('home')
+		
+	else:
+		form = AddRecords(instance=item)
+	
+	return render(request, 'myapp/update.html', {'form':form})
     

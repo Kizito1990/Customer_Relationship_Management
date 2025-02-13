@@ -20,4 +20,6 @@ class AddRecords(forms.ModelForm):
         model = Customer
         fields = '__all__'
 
+
+
     
